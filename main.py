@@ -10,13 +10,27 @@ transaction_bc = Blockchain(name='Transaction Blockchain')
 transaction_bc.create_genesis_block()
 
 
+@app.get("/blocks")
+async def get_blocks():
+    try:
+        data = []
+        for block in transaction_bc.chain:
+            data.append(block.dict())
+        return json.dumps({
+            "length": len(data),
+            "blocks": data
+        })
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+
+
 @app.get("/transactions")
 async def get_transaction_history():
     try:
         data = []
         for block in transaction_bc.chain:
             for transaction in block.transactions:
-                data.append(transaction)
+                data.append(transaction.dict())
         return json.dumps({
             "length": len(data),
             "transactions": data
@@ -28,9 +42,12 @@ async def get_transaction_history():
 @app.get("/pending-transactions")
 async def get_pending_transactions():
     try:
+        data = []
+        for transaction in transaction_bc.pending_transactions:
+            data.append(transaction.dict())
         return json.dumps({
             "length": len(transaction_bc.pending_transactions),
-            "transactions": transaction_bc.pending_transactions
+            "transactions": data
         })
     except Exception as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))

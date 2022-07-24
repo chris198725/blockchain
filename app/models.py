@@ -50,7 +50,7 @@ class Blockchain(BaseModel):
             raise block_chain_errors.mismatch_hash_error
 
         # Validate whether the proof satisfy the difficulty criteria
-        if not (proof.startswith('0' * Blockchain.difficulty) and proof == new_block.get_hash()):
+        if not (proof.startswith('0' * self.difficulty) and proof == new_block.get_hash()):
             raise block_chain_errors.invalid_proof_error
 
         new_block.hash = proof
@@ -63,7 +63,7 @@ class Blockchain(BaseModel):
         Try to adjust the nonce value to satisfy the difficultly criteria
         """
         proof = new_block.get_hash()
-        while not proof.startwith('0' * self.difficulty):
+        while not proof.startswith('0' * self.difficulty):
             new_block.nonce += 1
             proof = new_block.get_hash()
         return proof
