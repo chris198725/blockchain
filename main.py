@@ -13,7 +13,7 @@ transaction_bc.init()
 @app.get("/block/{block_index}")
 async def get_block(block_index):
     block = Block.find_by_index(block_index)
-    return block.json()
+    return block.dict()
 
 
 @app.get("/blocks")
