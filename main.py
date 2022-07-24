@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 import json
 
 from app.models import Blockchain, Transaction
@@ -12,25 +12,45 @@ transaction_bc.create_genesis_block()
 
 @app.get("/transactions")
 async def get_transaction_history():
-    data = []
-    for block in transaction_bc.chain:
-        for transaction in block.transactions:
-            data.append(transaction)
-    return json.dumps({
-        "length": len(data),
-        "transactions": data
-    })
+    try:
+        data = []
+        for block in transaction_bc.chain:
+            for transaction in block.transactions:
+                data.append(transaction)
+        return json.dumps({
+            "length": len(data),
+            "transactions": data
+        })
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
 
-@app.post("/transaction")
+@app.get("/pending-transactions")
+async def get_pending_transactions():
+    try:
+        return json.dumps({
+            "length": len(transaction_bc.pending_transactions),
+            "transactions": transaction_bc.pending_transactions
+        })
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+
+
+@app.post("/transaction", response_model=Transaction)
 async def add_transaction(transaction: Transaction):
-    transaction_bc.add_new_transaction(transaction)
-    return transaction
+    try:
+        transaction_bc.add_new_transaction(transaction)
+        return transaction
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(error))
 
 
 @app.post("/mining")
 async def mining():
-    transaction_bc.mine()
-    return {
-        "message": "Mining completed."
-    }
+    try:
+        transaction_bc.mine()
+        return {
+            "message": "Mining completed."
+        }
+    except Exception as error:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(error))
