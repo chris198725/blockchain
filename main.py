@@ -47,10 +47,10 @@ async def get_transaction_history():
 async def get_pending_transactions():
     try:
         data = [transaction.dict() for transaction in transaction_bc.pending_transactions]
-        return json.dumps({
+        return {
             "length": len(data),
             "transactions": data
-        })
+        }
     except Exception as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
