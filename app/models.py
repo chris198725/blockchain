@@ -58,7 +58,7 @@ class Blockchain(BaseModel):
     def chain(self) -> List[Block]:
         chain_data = list()
         if self.last_block_index != 0:
-            for i in range(1, self.last_block_index):
+            for i in range(0, self.last_block_index + 1):
                 block = Block.find_by_index(i)
                 chain_data.append(block)
         return chain_data
@@ -108,6 +108,7 @@ class Blockchain(BaseModel):
         new_block.hash = proof
         # self.chain.append(new_block)
         r.set(new_block.index, new_block.json())
+        r.set('last_block', new_block.index)
         return True
 
     def proof_of_work(self, new_block) -> str:

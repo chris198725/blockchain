@@ -16,8 +16,8 @@ async def get_block(block_index):
     return block.dict()
 
 
-@app.get("/blocks")
-async def get_blocks():
+@app.get("/chain")
+async def get_full_blockchain():
     try:
         data = [block.dict() for block in transaction_bc.chain]
         return {
