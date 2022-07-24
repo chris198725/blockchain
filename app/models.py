@@ -57,7 +57,7 @@ class Blockchain(BaseModel):
     @property
     def chain(self) -> List[Block]:
         chain_data = list()
-        if self.last_block != 0:
+        if self.last_block_index != 0:
             for i in range(1, self.last_block_index):
                 block = Block.find_by_index(i)
                 chain_data.append(block)
@@ -66,7 +66,10 @@ class Blockchain(BaseModel):
     @property
     def last_block_index(self) -> int:
         # return self.chain[-1]
-        return eval(r.get('last_block').decode('utf-8'))
+        data = r.get('last_block')
+        if data is not None:
+            return eval(data.decode('utf-8'))
+        return data
 
     @property
     def last_block(self) -> Block:
@@ -80,8 +83,9 @@ class Blockchain(BaseModel):
                 transactions.append(Transaction(**trans_dict))
         return transactions
 
-    def create_genesis_block(self):
-        if len(self.chain) == 0:
+    def init(self):
+        # Create genesis block
+        if self.last_block_index is None:
             genesis_block = Block(
                 index=0,
                 timestamp=datetime.now().strftime(config.timestamp_fmt),
@@ -91,8 +95,6 @@ class Blockchain(BaseModel):
             r.set('last_block', 0)
             r.set(0, genesis_block.json())
             # self.chain.append(genesis_block)
-        else:
-            raise block_chain_errors.blockchain_not_empty_error
 
     def add_block(self, new_block, proof) -> bool:
         # Check whether the previous hash of block is matched with the has of last block

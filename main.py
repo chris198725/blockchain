@@ -1,21 +1,25 @@
 from fastapi import FastAPI, HTTPException, status
 import json
 
-from app.models import Blockchain, Transaction
+from app.models import Blockchain, Block, Transaction
 
 
 app = FastAPI(name='Blockchain')
 
-transaction_bc = Blockchain(name='Transaction Blockchain')
-transaction_bc.create_genesis_block()
+transaction_bc = Blockchain(name='Blockchain')
+transaction_bc.init()
+
+
+@app.get("/block/{block_index}")
+async def get_block(block_index):
+    block = Block.find_by_index(block_index)
+    return block.json()
 
 
 @app.get("/blocks")
 async def get_blocks():
     try:
-        data = []
-        for block in transaction_bc.chain:
-            data.append(block.dict())
+        data = [block.dict() for block in transaction_bc.chain]
         return json.dumps({
             "length": len(data),
             "blocks": data
@@ -42,11 +46,9 @@ async def get_transaction_history():
 @app.get("/pending-transactions")
 async def get_pending_transactions():
     try:
-        data = []
-        for transaction in transaction_bc.pending_transactions:
-            data.append(transaction.dict())
+        data = [transaction.dict() for transaction in transaction_bc.pending_transactions]
         return json.dumps({
-            "length": len(transaction_bc.pending_transactions),
+            "length": len(data),
             "transactions": data
         })
     except Exception as error:
