@@ -4,7 +4,7 @@ import json
 from app.models import Blockchain, Transaction
 
 
-app = FastAPI()
+app = FastAPI(name='Blockchain')
 
 transaction_bc = Blockchain(name='Transaction Blockchain')
 transaction_bc.create_genesis_block()
@@ -30,7 +30,7 @@ async def get_transaction_history():
         data = []
         for block in transaction_bc.chain:
             for transaction in block.transactions:
-                data.append(transaction.dict())
+                data.append(transaction)
         return json.dumps({
             "length": len(data),
             "transactions": data
