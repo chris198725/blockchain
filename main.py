@@ -20,10 +20,10 @@ async def get_block(block_index):
 async def get_blocks():
     try:
         data = [block.dict() for block in transaction_bc.chain]
-        return json.dumps({
+        return {
             "length": len(data),
             "blocks": data
-        })
+        }
     except Exception as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
@@ -35,10 +35,10 @@ async def get_transaction_history():
         for block in transaction_bc.chain:
             for transaction in block.transactions:
                 data.append(transaction)
-        return json.dumps({
+        return {
             "length": len(data),
             "transactions": data
-        })
+        }
     except Exception as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
